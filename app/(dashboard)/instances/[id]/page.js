@@ -50,6 +50,19 @@ export default async function InstanceDetailPage({ params }) {
         </div>
       </div>
 
+      {/* Quick actions */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
+        <Link href={`/instances/${id}/templates`} style={{ display:'inline-flex', alignItems:'center', gap:'6px', fontSize:'13px', fontWeight:600, color:'#c084fc', background:'rgba(168,85,247,0.1)', border:'1px solid rgba(168,85,247,0.25)', borderRadius:'8px', padding:'8px 14px', textDecoration:'none' }}>
+          📋 Message Templates
+        </Link>
+        <Link href={`/instances/${id}/edit`} style={{ display:'inline-flex', alignItems:'center', gap:'6px', fontSize:'13px', fontWeight:600, color:'var(--text-muted)', background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:'8px', padding:'8px 14px', textDecoration:'none' }}>
+          ✎ Update Credentials
+        </Link>
+        <Link href="/api-keys" style={{ display:'inline-flex', alignItems:'center', gap:'6px', fontSize:'13px', fontWeight:600, color:'#93c5fd', background:'rgba(96,165,250,0.08)', border:'1px solid rgba(96,165,250,0.2)', borderRadius:'8px', padding:'8px 14px', textDecoration:'none' }}>
+          ⌘ API Keys
+        </Link>
+      </div>
+
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
         {[
@@ -106,9 +119,6 @@ export default async function InstanceDetailPage({ params }) {
             </div>
           ))}
         </div>
-        <Link href={`/instances/${id}/edit`} className="btn-ghost" style={{ marginTop: '16px', fontSize: '13px', padding: '8px 14px' }}>
-          ✎ Update credentials
-        </Link>
       </div>
 
       {/* API Keys for this instance */}

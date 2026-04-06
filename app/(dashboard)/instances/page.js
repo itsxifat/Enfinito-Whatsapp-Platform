@@ -44,16 +44,13 @@ export default async function InstancesPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {instances.map(inst => (
             <Link key={inst._id} href={`/instances/${inst._id}`} style={{ textDecoration: 'none' }}>
-              <div style={{
+              <div className="instance-card" style={{
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
                 borderRadius: '12px', padding: '20px 24px',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 transition: 'border-color 0.15s, background 0.15s',
                 cursor: 'pointer',
-              }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = '#333'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-              >
+              }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <div style={{
                     width: '44px', height: '44px', borderRadius: '12px',

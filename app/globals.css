@@ -123,6 +123,9 @@ html, body {
 .dot-red { width: 6px; height: 6px; border-radius: 50%; background: var(--red); display: inline-block; }
 .dot-yellow { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); display: inline-block; }
 
+/* Instance card hover */
+.instance-card:hover { border-color: #333 !important; background: var(--bg-card-hover) !important; }
+
 /* Legal pages TOC sidebar */
 .legal-toc { display: none; }
 @media (min-width: 768px) { .legal-toc { display: block !important; } }

@@ -26,10 +26,6 @@ export async function POST(request) {
 
   const { keyRow } = auth
 
-  if (!keyRow.is_connected) {
-    return NextResponse.json({ error: 'WhatsApp instance is not connected yet.' }, { status: 400 })
-  }
-
   let body
   try { body = await request.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 })

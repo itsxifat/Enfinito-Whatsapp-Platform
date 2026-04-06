@@ -21,6 +21,11 @@ export async function GET(request, { params }) {
   if (!inst) return new Response('Not found', { status: 404 })
 
   if (mode === 'subscribe' && token === inst.webhook_verify_token) {
+    // Mark instance as connected on successful webhook verification
+    await db.collection('whatsapp_instances').updateOne(
+      { _id: instanceId },
+      { $set: { is_connected: true } }
+    )
     return new Response(challenge, { status: 200 })
   }
 

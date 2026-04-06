@@ -4,6 +4,7 @@ import { decrypt } from '@/lib/crypto.js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import InstanceActions from './InstanceActions.js'
+import MessageTester from './MessageTester.js'
 
 export default async function InstanceDetailPage({ params }) {
   const session = await getSession()
@@ -82,6 +83,9 @@ export default async function InstanceDetailPage({ params }) {
           Subscribe to: <strong style={{ color: 'var(--text)' }}>messages</strong> in the Webhook fields section
         </div>
       </div>
+
+      {/* Message Tester */}
+      <MessageTester instanceId={id} />
 
       {/* API Credentials (masked) */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '20px' }}>

@@ -90,6 +90,14 @@ export async function POST(request) {
     created_at:     Math.floor(Date.now() / 1000),
   })
 
+  // Mark instance as connected on first successful send
+  if (!keyRow.is_connected) {
+    db.collection('whatsapp_instances').updateOne(
+      { _id: keyRow.instance_id },
+      { $set: { is_connected: true } }
+    ).catch(() => {})
+  }
+
   return NextResponse.json({
     success:   true,
     messageId: metaData.messages?.[0]?.id,

@@ -77,6 +77,14 @@ export async function POST(request, { params }) {
     }, { status: metaRes.status })
   }
 
+  // Mark instance as connected on first successful send
+  if (!inst.is_connected) {
+    await db.collection('whatsapp_instances').updateOne(
+      { _id: id },
+      { $set: { is_connected: true } }
+    )
+  }
+
   return NextResponse.json({
     success:   true,
     messageId: metaData.messages?.[0]?.id ?? null,

@@ -6,13 +6,14 @@ export async function DELETE(request, { params }) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
+  const { id } = await params
   const db = await getDb()
   const key = await db.collection('api_keys').findOne(
-    { _id: params.id, user_id: session.sub },
+    { _id: id, user_id: session.sub },
     { projection: { _id: 1 } }
   )
   if (!key) return NextResponse.json({ error: 'Key not found.' }, { status: 404 })
 
-  await db.collection('api_keys').updateOne({ _id: params.id }, { $set: { is_active: false } })
+  await db.collection('api_keys').updateOne({ _id: id }, { $set: { is_active: false } })
   return NextResponse.json({ message: 'API key revoked.' })
 }

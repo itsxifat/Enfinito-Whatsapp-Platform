@@ -7,6 +7,7 @@ const userNav = [
   { href: '/dashboard', label: 'Dashboard', icon: '▦' },
   { href: '/instances', label: 'Instances', icon: '◈' },
   { href: '/api-keys', label: 'API Keys', icon: '⌘' },
+  { href: '/setup-guide', label: 'Setup Guide', icon: '◉', highlight: true },
   { href: '/docs', label: 'API Docs', icon: '◎' },
   { href: '/profile', label: 'Profile', icon: '○' },
   { href: '/settings', label: 'Settings', icon: '⚙' },
@@ -62,6 +63,7 @@ export default function Sidebar({ user }) {
         {navItems.map(item => {
           const active = pathname === item.href || pathname.startsWith(item.href + '/')
           const isAdmin = item.href === '/admin'
+          const isHighlight = item.highlight && !active
           return (
             <Link key={item.href} href={item.href} style={{
               display: 'flex', alignItems: 'center', gap: '10px',
@@ -80,6 +82,13 @@ export default function Sidebar({ user }) {
                   background: 'rgba(245,158,11,0.15)', color: 'var(--yellow)',
                   padding: '2px 5px', borderRadius: '4px', letterSpacing: '0.05em',
                 }}>ADMIN</span>
+              )}
+              {isHighlight && (
+                <span style={{
+                  marginLeft: 'auto', fontSize: '9px', fontWeight: 700,
+                  background: 'rgba(37,211,102,0.15)', color: 'var(--accent)',
+                  padding: '2px 5px', borderRadius: '4px', letterSpacing: '0.05em',
+                }}>NEW</span>
               )}
             </Link>
           )

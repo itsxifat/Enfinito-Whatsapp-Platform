@@ -23,7 +23,13 @@ export default async function DashboardLayout({ children }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
       <Sidebar user={user} />
-      <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '100%', overflowX: 'hidden' }}>
+      <main className="dashboard-main-mobile-pad" style={{
+        flex: 1,
+        padding: 'clamp(16px, 3vw, 32px)',
+        maxWidth: '100%',
+        overflowX: 'hidden',
+        minWidth: 0,
+      }}>
         {children}
       </main>
     </div>

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm run:*)",
       "Bash(fsutil fsinfo:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(grep -E \"^e:\\\\\\\\\\\\\\\\En-Tech\\\\\\\\\\\\\\\\internel\\\\\\\\\\\\\\\\wahtsapp-api/[^/]+$\")"
     ]
   }
 }

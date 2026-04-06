@@ -1,21 +1,33 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const userNav = [
-  { href: '/dashboard', label: 'Dashboard', icon: '▦' },
-  { href: '/instances', label: 'Instances', icon: '◈' },
-  { href: '/api-keys', label: 'API Keys', icon: '⌘' },
-  { href: '/setup-guide', label: 'Setup Guide', icon: '◉', highlight: true },
-  { href: '/docs', label: 'API Docs', icon: '◎' },
-  { href: '/profile', label: 'Profile', icon: '○' },
-  { href: '/settings', label: 'Settings', icon: '⚙' },
+  { href: '/dashboard',    label: 'Dashboard',   icon: '▦' },
+  { href: '/instances',    label: 'Instances',    icon: '◈' },
+  { href: '/api-keys',     label: 'API Keys',     icon: '⌘' },
+  { href: '/setup-guide',  label: 'Setup Guide',  icon: '◉', highlight: true },
+  { href: '/docs',         label: 'API Docs',     icon: '◎' },
+  { href: '/profile',      label: 'Profile',      icon: '○' },
+  { href: '/settings',     label: 'Settings',     icon: '⚙' },
 ]
 
 export default function Sidebar({ user }) {
   const pathname = usePathname()
   const [loggingOut, setLoggingOut] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  // close sidebar on route change
+  useEffect(() => { setMobileOpen(false) }, [pathname])
+
+  // lock body scroll when mobile sidebar open
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    }
+    return () => { if (typeof document !== 'undefined') document.body.style.overflow = '' }
+  }, [mobileOpen])
 
   async function handleLogout() {
     setLoggingOut(true)
@@ -27,22 +39,25 @@ export default function Sidebar({ user }) {
     ? [...userNav, { href: '/admin', label: 'Admin Panel', icon: '◆' }]
     : userNav
 
-  return (
-    <aside style={{
-      width: '220px',
-      minHeight: '100vh',
-      background: '#0d0d0d',
-      borderRight: '1px solid var(--border)',
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '24px 0',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      zIndex: 50,
-    }}>
-      {/* Logo */}
-      <div style={{ padding: '0 20px 28px' }}>
+  const sidebarContent = (
+    <aside
+      className={`sidebar-mobile${mobileOpen ? ' open' : ''}`}
+      style={{
+        width: '220px',
+        minHeight: '100vh',
+        background: '#0d0d0d',
+        borderRight: '1px solid var(--border)',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '24px 0',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: 50,
+      }}
+    >
+      {/* Logo + mobile close */}
+      <div style={{ padding: '0 20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             width: '32px', height: '32px', borderRadius: '8px',
@@ -50,12 +65,22 @@ export default function Sidebar({ user }) {
             justifyContent: 'center', fontSize: '16px', flexShrink: 0,
           }}>✦</div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)', letterSpacing: '-0.02em' }}>
-              Enfinito
-            </div>
+            <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)', letterSpacing: '-0.02em' }}>Enfinito</div>
             <div style={{ fontSize: '10px', color: 'var(--text-dim)', marginTop: '1px' }}>WhatsApp API</div>
           </div>
         </div>
+        {/* Mobile close button */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="sidebar-close-btn"
+          style={{
+            background: 'transparent', border: '1px solid var(--border)',
+            borderRadius: '6px', width: '28px', height: '28px',
+            alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: 'var(--text-dim)', fontSize: '14px',
+            flexShrink: 0,
+          }}
+        >✕</button>
       </div>
 
       {/* Nav */}
@@ -67,14 +92,15 @@ export default function Sidebar({ user }) {
           return (
             <Link key={item.href} href={item.href} style={{
               display: 'flex', alignItems: 'center', gap: '10px',
-              padding: '9px 10px', borderRadius: '8px', marginBottom: '2px',
+              padding: '10px 10px', borderRadius: '8px', marginBottom: '2px',
               fontSize: '13px', fontWeight: 500, textDecoration: 'none',
               background: active ? (isAdmin ? 'rgba(245,158,11,0.1)' : 'var(--accent-glow)') : 'transparent',
               color: active ? (isAdmin ? 'var(--yellow)' : 'var(--accent)') : 'var(--text-muted)',
               border: active ? `1px solid ${isAdmin ? 'rgba(245,158,11,0.2)' : 'rgba(37,211,102,0.15)'}` : '1px solid transparent',
               transition: 'all 0.12s ease',
+              minHeight: '40px',
             }}>
-              <span style={{ fontSize: '14px', opacity: active ? 1 : 0.6 }}>{item.icon}</span>
+              <span style={{ fontSize: '14px', opacity: active ? 1 : 0.6, flexShrink: 0 }}>{item.icon}</span>
               {item.label}
               {isAdmin && (
                 <span style={{
@@ -136,10 +162,10 @@ export default function Sidebar({ user }) {
           </div>
         </Link>
         <button onClick={handleLogout} disabled={loggingOut} style={{
-          width: '100%', padding: '8px', borderRadius: '8px',
+          width: '100%', padding: '9px', borderRadius: '8px',
           background: 'transparent', border: '1px solid var(--border)',
           color: 'var(--text-dim)', fontSize: '12px', cursor: 'pointer',
-          transition: 'all 0.12s ease',
+          transition: 'all 0.12s ease', minHeight: '38px',
         }}
           onMouseEnter={e => { e.target.style.color = 'var(--red)'; e.target.style.borderColor = 'rgba(239,68,68,0.3)' }}
           onMouseLeave={e => { e.target.style.color = 'var(--text-dim)'; e.target.style.borderColor = 'var(--border)' }}
@@ -148,5 +174,26 @@ export default function Sidebar({ user }) {
         </button>
       </div>
     </aside>
+  )
+
+  return (
+    <>
+      {/* Mobile hamburger toggle */}
+      <button
+        className="mobile-nav-toggle"
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open navigation"
+      >
+        ☰
+      </button>
+
+      {/* Backdrop overlay */}
+      <div
+        className={`sidebar-overlay${mobileOpen ? ' open' : ''}`}
+        onClick={() => setMobileOpen(false)}
+      />
+
+      {sidebarContent}
+    </>
   )
 }

@@ -66,19 +66,21 @@ export async function POST(request, { params }) {
 
   if (!metaRes.ok) {
     return NextResponse.json({
-      success:    false,
-      httpStatus: metaRes.status,
-      error:      metaData?.error?.message  ?? 'Unknown error from Meta',
-      code:       metaData?.error?.code     ?? null,
-      type:       metaData?.error?.type     ?? null,
-      fbtrace_id: metaData?.error?.fbtrace_id ?? null,
-      raw:        metaData,
+      success:       false,
+      httpStatus:    metaRes.status,
+      error:         metaData?.error?.message  ?? 'Unknown error from Meta',
+      code:          metaData?.error?.code     ?? null,
+      type:          metaData?.error?.type     ?? null,
+      fbtrace_id:    metaData?.error?.fbtrace_id ?? null,
+      _debug:        { phoneNumberId, to: payload.to },
+      raw:           metaData,
     }, { status: metaRes.status })
   }
 
   return NextResponse.json({
     success:   true,
     messageId: metaData.messages?.[0]?.id ?? null,
+    _debug:    { phoneNumberId, to: payload.to },
     raw:       metaData,
   })
 }

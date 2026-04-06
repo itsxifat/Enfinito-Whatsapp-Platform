@@ -1,0 +1,29 @@
+{
+  "name": "wahtsapp-api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=\"--require E:/En-Tech/internel/wahtsapp-api/patch-fs.cjs\" next dev --webpack",
+    "build": "cross-env NODE_OPTIONS=\"--require E:/En-Tech/internel/wahtsapp-api/patch-fs.cjs\" next build --webpack",
+    "start": "cross-env NODE_OPTIONS=\"--require E:/En-Tech/internel/wahtsapp-api/patch-fs.cjs\" next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.2",
+    "mongodb": "^7.1.1",
+    "next": "16.2.2",
+    "nodemailer": "^6.10.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "cross-env": "^10.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.2",
+    "tailwindcss": "^4"
+  }
+}

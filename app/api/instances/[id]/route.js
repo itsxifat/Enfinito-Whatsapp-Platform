@@ -1,0 +1,87 @@
+import { NextResponse } from 'next/server'
+import { getSession } from '@/lib/auth.js'
+import { getDb } from '@/lib/db.js'
+import { encrypt, decrypt } from '@/lib/crypto.js'
+import { z } from 'zod'
+
+export async function GET(request, { params }) {
+  const session = await getSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
+
+  const db = await getDb()
+  const inst = await db.collection('whatsapp_instances').findOne({
+    _id: params.id, user_id: session.sub, is_active: true
+  })
+
+  if (!inst) return NextResponse.json({ error: 'Instance not found.' }, { status: 404 })
+
+  return NextResponse.json({
+    instance: {
+      id:                 inst._id,
+      name:               inst.name,
+      phoneNumber:        inst.phone_number,
+      phoneNumberId:      decrypt(inst.phone_number_id_encrypted),
+      wabaId:             decrypt(inst.waba_id_encrypted),
+      appId:              decrypt(inst.app_id_encrypted),
+      isConnected:        inst.is_connected,
+      webhookVerifyToken: inst.webhook_verify_token,
+      createdAt:          inst.created_at,
+    }
+  })
+}
+
+export async function PATCH(request, { params }) {
+  const session = await getSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
+
+  const db = await getDb()
+  const inst = await db.collection('whatsapp_instances').findOne(
+    { _id: params.id, user_id: session.sub, is_active: true },
+    { projection: { _id: 1 } }
+  )
+  if (!inst) return NextResponse.json({ error: 'Instance not found.' }, { status: 404 })
+
+  let body
+  try { body = await request.json() } catch {
+    return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 })
+  }
+
+  const schema = z.object({
+    name:        z.string().min(1).max(80).optional(),
+    accessToken: z.string().min(1).optional(),
+    appSecret:   z.string().min(1).optional(),
+    phoneNumber: z.string().optional(),
+  })
+  const parsed = schema.safeParse(body)
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
+
+  const $set = {}
+  if (parsed.data.name        !== undefined) $set.name                     = parsed.data.name
+  if (parsed.data.accessToken !== undefined) $set.access_token_encrypted   = encrypt(parsed.data.accessToken)
+  if (parsed.data.appSecret   !== undefined) $set.app_secret_encrypted     = encrypt(parsed.data.appSecret)
+  if (parsed.data.phoneNumber !== undefined) $set.phone_number             = parsed.data.phoneNumber
+
+  if (Object.keys($set).length > 0) {
+    await db.collection('whatsapp_instances').updateOne({ _id: params.id }, { $set })
+  }
+
+  return NextResponse.json({ message: 'Instance updated.' })
+}
+
+export async function DELETE(request, { params }) {
+  const session = await getSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
+
+  const db = await getDb()
+  const inst = await db.collection('whatsapp_instances').findOne(
+    { _id: params.id, user_id: session.sub },
+    { projection: { _id: 1 } }
+  )
+  if (!inst) return NextResponse.json({ error: 'Instance not found.' }, { status: 404 })
+
+  // Soft delete
+  await db.collection('whatsapp_instances').updateOne({ _id: params.id }, { $set: { is_active: false } })
+  await db.collection('api_keys').updateMany({ instance_id: params.id }, { $set: { is_active: false } })
+
+  return NextResponse.json({ message: 'Instance deleted.' })
+}

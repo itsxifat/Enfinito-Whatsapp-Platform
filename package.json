@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=\"--require E:/En-Tech/internel/wahtsapp-api/patch-fs.cjs\" next dev --webpack",
-    "build": "cross-env NODE_OPTIONS=\"--require E:/En-Tech/internel/wahtsapp-api/patch-fs.cjs\" next build --webpack",
-    "start": "cross-env NODE_OPTIONS=\"--require E:/En-Tech/internel/wahtsapp-api/patch-fs.cjs\" next start",
+    "dev": "cross-env NODE_OPTIONS=\"--require ./patch-fs.cjs\" next dev --webpack",
+    "build": "cross-env NODE_OPTIONS=\"--require ./patch-fs.cjs\" next build --webpack",
+    "start": "cross-env NODE_OPTIONS=\"--require ./patch-fs.cjs\" next start",
     "lint": "eslint"
   },
   "dependencies": {

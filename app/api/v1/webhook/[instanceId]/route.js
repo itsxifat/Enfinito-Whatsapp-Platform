@@ -6,6 +6,7 @@ import { decrypt } from '@/lib/crypto.js'
 
 // GET: Meta webhook verification challenge
 export async function GET(request, { params }) {
+  const { instanceId } = await params
   const { searchParams } = new URL(request.url)
   const mode      = searchParams.get('hub.mode')
   const token     = searchParams.get('hub.verify_token')
@@ -13,7 +14,7 @@ export async function GET(request, { params }) {
 
   const db = await getDb()
   const inst = await db.collection('whatsapp_instances').findOne(
-    { _id: params.instanceId, is_active: true },
+    { _id: instanceId, is_active: true },
     { projection: { webhook_verify_token: 1 } }
   )
 
@@ -28,9 +29,10 @@ export async function GET(request, { params }) {
 
 // POST: Receive inbound messages from Meta
 export async function POST(request, { params }) {
+  const { instanceId } = await params
   const db = await getDb()
   const inst = await db.collection('whatsapp_instances').findOne({
-    _id: params.instanceId, is_active: true
+    _id: instanceId, is_active: true
   })
 
   if (!inst) return new Response('Not found', { status: 404 })
@@ -63,7 +65,7 @@ export async function POST(request, { params }) {
       await db.collection('messages_log').insertMany(
         messages.map(msg => ({
           _id:            uuidv4(),
-          instance_id:    params.instanceId,
+          instance_id:    instanceId,
           direction:      'inbound',
           contact_number: msg.from,
           message_type:   msg.type || 'unknown',
@@ -76,7 +78,7 @@ export async function POST(request, { params }) {
       // Mark instance as connected on first message received
       if (!inst.is_connected) {
         await db.collection('whatsapp_instances').updateOne(
-          { _id: params.instanceId },
+          { _id: instanceId },
           { $set: { is_connected: true } }
         )
       }

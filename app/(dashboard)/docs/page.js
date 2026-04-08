@@ -270,6 +270,94 @@ export default function DocsPage() {
 }`}</Code>
           </SubSection>
 
+          <SubSection title="Template with URL button (dynamic suffix)">
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.7 }}>
+              If your template has a <strong style={{ color: 'var(--text)' }}>URL button</strong> whose URL ends in <code style={{ fontFamily: 'monospace', fontSize: '12px' }}>{'{{1}}'}</code> (e.g. <em style={{ color: 'var(--text-dim)' }}>https://example.com/order/{'{{1}}'}</em>),
+              you must pass the dynamic suffix as a <code style={{ fontFamily: 'monospace', fontSize: '12px' }}>button</code> component:
+            </p>
+            <Code>{`{
+  "to": "+8801234567890",
+  "type": "template",
+  "template": {
+    "name": "order_tracking",
+    "language": { "code": "en_US" },
+    "components": [
+      {
+        "type": "body",
+        "parameters": [
+          { "type": "text", "text": "John" }
+        ]
+      },
+      {
+        "type": "button",
+        "sub_type": "url",
+        "index": "0",
+        "parameters": [
+          { "type": "text", "text": "ORD-98765" }
+        ]
+      }
+    ]
+  }
+}`}</Code>
+            <Note type="warning">
+              This is required when the button URL contains <code style={{ fontFamily: 'monospace', fontSize: '12px' }}>{'{{1}}'}</code>. Omitting it causes error <code style={{ fontFamily: 'monospace', fontSize: '12px' }}>#131008 — Required parameter is missing</code>.
+            </Note>
+            <Note type="tip">
+              <code style={{ fontFamily: 'monospace', fontSize: '12px' }}>index</code> is the 0-based position of the button in the template's BUTTONS component. If the URL button is the second button, use <code style={{ fontFamily: 'monospace', fontSize: '12px' }}>"index": "1"</code>.
+            </Note>
+          </SubSection>
+
+          <SubSection title="Template with quick reply buttons">
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.7 }}>
+              Quick reply buttons can carry a developer-defined <strong style={{ color: 'var(--text)' }}>payload</strong> that is sent back to your webhook when the user taps the button:
+            </p>
+            <Code>{`{
+  "to": "+8801234567890",
+  "type": "template",
+  "template": {
+    "name": "support_followup",
+    "language": { "code": "en_US" },
+    "components": [
+      {
+        "type": "button",
+        "sub_type": "quick_reply",
+        "index": "0",
+        "parameters": [
+          { "type": "payload", "payload": "YES_RESOLVED" }
+        ]
+      },
+      {
+        "type": "button",
+        "sub_type": "quick_reply",
+        "index": "1",
+        "parameters": [
+          { "type": "payload", "payload": "NO_STILL_OPEN" }
+        ]
+      }
+    ]
+  }
+}`}</Code>
+            <Note type="tip">
+              The payload value is returned in the webhook under <code style={{ fontFamily: 'monospace', fontSize: '12px' }}>messages[0].button.payload</code>. Use it to route the user's response in your system.
+            </Note>
+          </SubSection>
+
+          <SubSection title="Button types reference">
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
+              {[
+                ['URL', 'url', 'Opens a URL. If URL ends in {{1}}, pass the suffix as { "type": "text", "text": "..." }'],
+                ['QUICK_REPLY', 'quick_reply', 'Sends a payload to your webhook when tapped. Pass { "type": "payload", "payload": "..." }'],
+                ['PHONE_NUMBER', '(none)', 'Dials a static phone number. No parameters needed.'],
+              ].map(([type, subType, desc]) => (
+                <div key={type} style={{ display: 'grid', gridTemplateColumns: '140px 120px 1fr', padding: '12px 16px', borderBottom: '1px solid var(--border-subtle)', fontSize: '13px', gap: '12px', alignItems: 'start' }}>
+                  <code style={{ fontFamily: 'monospace', fontSize: '11px', fontWeight: 700, color: 'var(--accent)' }}>{type}</code>
+                  <code style={{ fontFamily: 'monospace', fontSize: '11px', color: '#93c5fd' }}>{subType}</code>
+                  <span style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{desc}</span>
+                </div>
+              ))}
+            </div>
+          </SubSection>
+
           <SubSection title="Template categories">
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
               {[

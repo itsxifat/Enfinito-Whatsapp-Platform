@@ -26,6 +26,15 @@ function extractVars(components) {
         }
       }
     }
+    if (c.type === 'BUTTONS' && c.buttons) {
+      c.buttons.forEach((btn, i) => {
+        if (btn.type === 'URL' && btn.url?.includes('{{1}}')) {
+          vars.push({ key: `button_${i}_url`, label: `Button "${btn.text}" — URL suffix`, component: 'button', index: i, btnType: 'url' })
+        } else if (btn.type === 'QUICK_REPLY') {
+          vars.push({ key: `button_${i}_payload`, label: `Button "${btn.text}" — payload`, component: 'button', index: i, btnType: 'quick_reply' })
+        }
+      })
+    }
   }
   return vars.sort((a, b) => a.component.localeCompare(b.component) || a.index - b.index)
 }
@@ -41,6 +50,7 @@ function buildTemplatePayload(tpl, vals) {
   const components = []
   const bodyComp = tpl.components.find(c => c.type === 'BODY')
   const headerComp = tpl.components.find(c => c.type === 'HEADER' && c.format === 'TEXT')
+  const buttonsComp = tpl.components.find(c => c.type === 'BUTTONS')
 
   if (headerComp && headerComp.text?.match(/\{\{\d+\}\}/)) {
     const params = [...headerComp.text.matchAll(/\{\{(\d+)\}\}/g)].map(m => ({
@@ -54,6 +64,29 @@ function buildTemplatePayload(tpl, vals) {
       type: 'text', text: vals[`body_${m[1]}`] || ''
     }))
     if (params.length) components.push({ type: 'body', parameters: params })
+  }
+
+  if (buttonsComp?.buttons) {
+    buttonsComp.buttons.forEach((btn, i) => {
+      if (btn.type === 'URL' && btn.url?.includes('{{1}}')) {
+        components.push({
+          type: 'button',
+          sub_type: 'url',
+          index: String(i),
+          parameters: [{ type: 'text', text: vals[`button_${i}_url`] || '' }],
+        })
+      } else if (btn.type === 'QUICK_REPLY') {
+        const payload = vals[`button_${i}_payload`]
+        if (payload) {
+          components.push({
+            type: 'button',
+            sub_type: 'quick_reply',
+            index: String(i),
+            parameters: [{ type: 'payload', payload }],
+          })
+        }
+      }
+    })
   }
 
   return {
@@ -202,11 +235,16 @@ function TemplateCard({ tpl, instanceId, onSent }) {
 
             {buttonsComp?.buttons && (
               <div style={{ display:'flex', gap:'6px', flexWrap:'wrap', marginTop:'10px', paddingTop:'10px', borderTop:'1px solid var(--border-subtle)' }}>
-                {buttonsComp.buttons.map((btn, i) => (
-                  <div key={i} style={{ fontSize:'12px', color:'var(--accent)', background:'rgba(37,211,102,0.08)', border:'1px solid rgba(37,211,102,0.2)', borderRadius:'6px', padding:'4px 10px', fontWeight:500 }}>
-                    {btn.text}
-                  </div>
-                ))}
+                {buttonsComp.buttons.map((btn, i) => {
+                  const icon = btn.type === 'URL' ? '🔗' : btn.type === 'PHONE_NUMBER' ? '📞' : btn.type === 'QUICK_REPLY' ? '↩' : ''
+                  return (
+                    <div key={i} style={{ fontSize:'12px', color:'var(--accent)', background:'rgba(37,211,102,0.08)', border:'1px solid rgba(37,211,102,0.2)', borderRadius:'6px', padding:'4px 10px', fontWeight:500, display:'flex', alignItems:'center', gap:'4px' }}>
+                      {icon && <span style={{ fontSize:'11px' }}>{icon}</span>}
+                      {btn.text}
+                      {btn.type === 'URL' && btn.url?.includes('{{1}}') && <span style={{ fontSize:'10px', color:'#fbbf24', marginLeft:'2px' }}>*</span>}
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>
